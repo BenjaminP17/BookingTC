@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: symfony_app
+    restart: always
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    ports:
+      - "8080:80" # Symfony accessible via localhost:8080
+    depends_on:
+      - database
+    environment:
+      APP_ENV: dev
+      DATABASE_URL: "mysql://user:password@database:3306/dbname"
+
+  database:
+    image: mysql:8.0
+    container_name: symfony_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: dbname
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3307:3306" # La base MySQL sera accessible sur localhost:3307
+    volumes:
+      - db_data:/var/lib/mysql
+
+  adminer:
+    image: adminer
+    container_name: symfony_adminer
+    restart: always
+    ports:
+      - "8081:8080" # Interface Adminer accessible via localhost:8081
+
+volumes:
+  db_data:
